@@ -1790,6 +1790,14 @@ class ExperimentManager {
             const politenessScore = await this.ui.showScoreSelection(politenessPrompt, -3, 3, politenessLabels);
             if (politenessScore === 'escape') return false;
             
+            // 截止当前练习组内的总体礼貌度评分（仅在第2、3个练习试次询问）
+            let practiceCumulativePolitenessScore;
+            if (i > 0) {
+                const cumulativePolitenessPrompt = "请你回顾本组对话的前几次对话，对这个机器人目前为止的<strong>总体礼貌程度</strong>进行评分";
+                practiceCumulativePolitenessScore = await this.ui.showScoreSelection(cumulativePolitenessPrompt, -3, 3, politenessLabels);
+                if (practiceCumulativePolitenessScore === 'escape') return false;
+            }
+            
             // 信息量评分
             const informativenessPrompt = "请为本次聊天机器人的<strong>信息量</strong>打分";
             const informativenessLabels = ['完全不满足', '远低于需求', '略低于需求', '恰好满足', '略高于需求', '明显超出', '远超需求'];
@@ -1805,6 +1813,7 @@ class ExperimentManager {
                 practiceParticipantInput: participantInput,
                 practiceBotReply: botReply,
                 practicePolitenessScore: politenessScore,
+                practicePolitenessOverallSoFarScore: practiceCumulativePolitenessScore,
                 practiceInformativenessScore: informativenessScore
             });
         }
@@ -1890,10 +1899,13 @@ class ExperimentManager {
                 const politenessScore = await this.ui.showScoreSelection(politenessPrompt, -3, 3, politenessLabels);
                 if (politenessScore === 'escape') return false;
 
-                // 截止当前组内的总体礼貌度评分（新增）
-                const cumulativePolitenessPrompt = "请你回顾本组对话的前几次对话，对这个机器人目前为止的<strong>总体礼貌程度</strong>进行评分";
-                const cumulativePolitenessScore = await this.ui.showScoreSelection(cumulativePolitenessPrompt, -3, 3, politenessLabels);
-                if (cumulativePolitenessScore === 'escape') return false;
+                // 截止当前组内的总体礼貌度评分（仅在每个block的第2-20个试次询问）
+                let cumulativePolitenessScore;
+                if (trial.trial_order > 1) {
+                    const cumulativePolitenessPrompt = "请你回顾本组对话的前几次对话，对这个机器人目前为止的<strong>总体礼貌程度</strong>进行评分";
+                    cumulativePolitenessScore = await this.ui.showScoreSelection(cumulativePolitenessPrompt, -3, 3, politenessLabels);
+                    if (cumulativePolitenessScore === 'escape') return false;
+                }
 
                 // 信息量评分
                 const informativenessPrompt = "请为本次聊天机器人的<strong>信息量</strong>打分";
@@ -2444,10 +2456,13 @@ class ExperimentManager {
                 const politenessScore = await this.ui.showScoreSelection(politenessPrompt, -3, 3, politenessLabels);
                 if (politenessScore === 'escape') return false;
 
-                // 截止当前组内的总体礼貌度评分（新增）
-                const cumulativePolitenessPrompt = "请你回顾本组对话的前几次对话，对这个机器人目前为止的<strong>总体礼貌程度</strong>进行评分";
-                const cumulativePolitenessScore = await this.ui.showScoreSelection(cumulativePolitenessPrompt, -3, 3, politenessLabels);
-                if (cumulativePolitenessScore === 'escape') return false;
+                // 截止当前组内的总体礼貌度评分（仅在每个block的第2-20个试次询问）
+                let cumulativePolitenessScore;
+                if (trial.trial_order > 1) {
+                    const cumulativePolitenessPrompt = "请你回顾本组对话的前几次对话，对这个机器人目前为止的<strong>总体礼貌程度</strong>进行评分";
+                    cumulativePolitenessScore = await this.ui.showScoreSelection(cumulativePolitenessPrompt, -3, 3, politenessLabels);
+                    if (cumulativePolitenessScore === 'escape') return false;
+                }
 
                 // 信息量评分
                 const informativenessPrompt = "请为本次聊天机器人的<strong>信息量</strong>打分";
